@@ -650,9 +650,10 @@
   function loadStats(){
     try{
       const raw = localStorage.getItem(LS_KEY);
-      if(!raw) return { bestTime:null, bestLevel:null, gamesPlayed:0, recordCount:0, cyclesCompleted:0, totalScore:0, nickname:'Busy Bee', nicknameSet:false };
+      if(!raw) return { currentLevel:1, bestTime:null, bestLevel:null, gamesPlayed:0, recordCount:0, cyclesCompleted:0, totalScore:0, nickname:'Busy Bee', nicknameSet:false };
       const s = JSON.parse(raw);
       return {
+        currentLevel: typeof s.currentLevel==='number' ? Math.max(1,Math.min(TOTAL_PETEK,Math.floor(s.currentLevel))) : 1,
         bestTime: typeof s.bestTime==='number' ? s.bestTime : null,
         bestLevel: typeof s.bestLevel==='number' ? s.bestLevel : null,
         gamesPlayed: typeof s.gamesPlayed==='number' ? s.gamesPlayed : 0,
@@ -662,14 +663,15 @@
         nickname: typeof s.nickname==='string' && s.nickname.trim() ? s.nickname.trim().slice(0,16) : 'Busy Bee',
         nicknameSet: s.nicknameSet === true || Boolean(typeof s.nickname==='string' && s.nickname.trim() && s.nickname.trim() !== 'Busy Bee')
       };
-    }catch(e){ return { bestTime:null, bestLevel:null, gamesPlayed:0, recordCount:0, cyclesCompleted:0, totalScore:0, nickname:'Busy Bee', nicknameSet:false }; }
+    }catch(e){ return { currentLevel:1, bestTime:null, bestLevel:null, gamesPlayed:0, recordCount:0, cyclesCompleted:0, totalScore:0, nickname:'Busy Bee', nicknameSet:false }; }
   }
   function saveStats(){
     try{
-      localStorage.setItem(LS_KEY, JSON.stringify({ bestTime, bestLevel, gamesPlayed, recordCount, cyclesCompleted, totalScore, nickname:beeName, nicknameSet }));
+      localStorage.setItem(LS_KEY, JSON.stringify({ currentLevel:level, bestTime, bestLevel, gamesPlayed, recordCount, cyclesCompleted, totalScore, nickname:beeName, nicknameSet }));
     }catch(e){ /* localStorage unavailable — stats just won't persist */ }
   }
   const savedStats = loadStats();
+  level = savedStats.currentLevel;
   let bestTime = savedStats.bestTime;
   let bestLevel = savedStats.bestLevel;
   let gamesPlayed = savedStats.gamesPlayed;
@@ -1337,6 +1339,7 @@
         // This hive is complete.
         const prevLevel = level;
         level++;
+        saveStats();
         afterPetekIncrease(prevLevel);
         if(level >= TOTAL_PETEK){
           completeCycle();
@@ -1483,6 +1486,7 @@
       showInterstitialAd(()=>{
         showToast((newRecord ? '🏆 New record · ' : '')+fmtTime(elapsed)+' · Hive 100 completed!');
         level = 1;
+        saveStats();
         comboStreak = 0;
         lastMatchAt = 0;
         if(boardFrameEl) boardFrameEl.style.filter = 'hue-rotate(0deg)';
@@ -1542,6 +1546,7 @@
 
   function restart(){
     level=1;
+    saveStats();
     startFromCurrentLevel();
   }
 
