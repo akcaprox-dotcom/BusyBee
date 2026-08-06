@@ -534,7 +534,7 @@
 <script>
 (function(){
   // ---------- Hex geometry (flat-top axial coordinates) ----------
-  const HEX = 25; // corner radius in px
+  const HEX = 34; // larger finger-friendly tile size in px
   const CELL_W = HEX*2;
   const CELL_H = HEX*Math.sqrt(3);
   const AX_DIRS = [ {q:1,r:0}, {q:1,r:-1}, {q:0,r:-1}, {q:-1,r:0}, {q:-1,r:1}, {q:0,r:1} ];
@@ -639,6 +639,7 @@
   let finished = false;
   let comboStreak = 0;
   let lastMatchAt = 0;
+  let interstitialTransitionCount = 0;
   const COMBO_WINDOW_MS = 3200;
   const boardFrameEl = document.querySelector('.board-frame');
 
@@ -1040,10 +1041,17 @@
   }
 
   function showInterstitialAd(onDone){
-    // TODO: Gerçek reklam SDK'sını burada devreye alın.
-    // Örn. Android WebView köprüsü: AndroidAdBridge.showInterstitial(onDone)
-    // ya da AdMob/web reklam SDK'sının "show interstitial" çağrısı.
-    // Show a five-second countdown placeholder for now.
+    interstitialTransitionCount++;
+    if(interstitialTransitionCount % 2 !== 0){
+      onDone();
+      return;
+    }
+    if(window.AndroidAdBridge && typeof window.AndroidAdBridge.showInterstitial === 'function'){
+      window.__busyBeeInterstitialDone = onDone;
+      window.AndroidAdBridge.showInterstitial();
+      return;
+    }
+    // Browser fallback for local testing without the Android AdMob bridge.
     let n = 5;
     adCountdownEl.textContent = n;
     adOverlayEl.classList.add('show');
