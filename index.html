@@ -1411,6 +1411,12 @@
       // bu, oyunun tamamen bitmesi anlamına gelmemeli, sadece bu petek
       // dalgası tükendi demektir. Sonraki peteğe (dolu kovana) geç.
       cellType = new Map();
+      // Petek sayacı burada da artmalı — aksi halde HIVE göstergesi hiç
+      // ilerlemeden yeni (dolu) kovan sessizce başlar.
+      const prevLevel = level;
+      level++;
+      saveStats();
+      afterPetekIncrease(prevLevel);
       if(level >= TOTAL_PETEK){
         completeCycle();
       } else {
