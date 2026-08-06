@@ -536,7 +536,7 @@
   // ---------- Hex geometry (flat-top axial coordinates) ----------
   // Keep the full radius-4 hive inside narrow phone screens while preserving
   // the larger finger-friendly tiles on tablets and desktop.
-  const HEX = Math.min(34, Math.max(22, (window.innerWidth-48)/13));
+  const HEX = Math.min(32, Math.max(16, (window.innerWidth-64)/14));
   const CELL_W = HEX*2;
   const CELL_H = HEX*Math.sqrt(3);
   const AX_DIRS = [ {q:1,r:0}, {q:1,r:-1}, {q:0,r:-1}, {q:-1,r:0}, {q:-1,r:1}, {q:0,r:1} ];
