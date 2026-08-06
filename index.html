@@ -854,6 +854,33 @@
     return matched;
   }
 
+  // Bir hücrenin üzerinden geçen (her iki yöne uzayan) 3'lü diziyi kontrol
+  // eder. Bir takas SADECE takas edilen iki hücrenin bulunduğu hizalarda
+  // yeni eşleşme yaratabileceği için, tüm tahtayı (findMatches()) yeniden
+  // taramak yerine sadece bu iki hücreyi kontrol etmek yeterlidir.
+  // Bu, hasAnyMove()'u O(n²)'den O(n)'e indirir — petek sayısı arttıkça
+  // hissedilen yavaşlamanın asıl sebebi buydu.
+  function cellHasRunAt(ck){
+    const [q0,r0] = ck.split(',').map(Number);
+    for(const d of LINE_DIRS){
+      let count = 1;
+      let q=q0+d.q, r=r0+d.r;
+      while(true){
+        const nk = key(q,r);
+        if(!coordSet.has(nk) || !typesMatch(ck,nk)) break;
+        count++; q+=d.q; r+=d.r;
+      }
+      q=q0-d.q; r=r0-d.r;
+      while(true){
+        const nk = key(q,r);
+        if(!coordSet.has(nk) || !typesMatch(ck,nk)) break;
+        count++; q-=d.q; r-=d.r;
+      }
+      if(count>=3) return true;
+    }
+    return false;
+  }
+
   function hasAnyMove(){
     for(const c of coords){
       for(const d of AX_DIRS){
@@ -864,9 +891,9 @@
         const a = cellType.get(ck), b = cellType.get(nk);
         if(a===undefined || b===undefined || a===b) continue;
         cellType.set(ck,b); cellType.set(nk,a);
-        const m = findMatches();
+        const found = cellHasRunAt(ck) || cellHasRunAt(nk);
         cellType.set(ck,a); cellType.set(nk,b);
-        if(m.size>0) return true;
+        if(found) return true;
       }
     }
     return false;
