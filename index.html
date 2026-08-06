@@ -1356,7 +1356,7 @@
     setupCoords(START_COUNT);
     initialAliveForRun = coords.length;
     randomFill();
-    render(true);
+    render(window.innerWidth >= 600);
     updateHud();
     busy = false;
   }
@@ -1489,7 +1489,7 @@
         setupCoords(START_COUNT);
         initialAliveForRun = coords.length;
         randomFill();
-        render(true);
+        render(window.innerWidth >= 600);
         updateHud();
         startTimerNow();
         busy = false;
@@ -1536,7 +1536,7 @@
     setupCoords(START_COUNT);
     initialAliveForRun = coords.length;
     randomFill();
-    render(true);
+    render(window.innerWidth >= 600);
     updateHud();
   }
 
